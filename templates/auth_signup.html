@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h4 mb-3">Create your account (KYC)</h1>
+<form method="post" class="row g-3">
+  <div class="col-md-6">
+    <label class="form-label">Full name</label>
+    <input class="form-control" name="full_name" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">ID / Passport (optional)</label>
+    <input class="form-control" name="id_number">
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Email</label>
+    <input type="email" class="form-control" name="email" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Phone (M-Pesa)</label>
+    <input class="form-control" name="phone" placeholder="07XXXXXXXX or 2547XXXXXXXX" required>
+    <div class="form-text">We'll use this number for M-Pesa STK push.</div>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">County</label>
+    <input class="form-control" name="county">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Town</label>
+    <input class="form-control" name="town">
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">Street / Address</label>
+    <input class="form-control" name="address">
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Password</label>
+    <input type="password" class="form-control" name="password" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Confirm password</label>
+    <input type="password" class="form-control" name="confirm" required>
+  </div>
+
+  <div class="col-12 d-flex gap-2">
+    <button class="btn btn-primary">Create account</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('login') }}">I already have an account</a>
+  </div>
+</form>
+{% endblock %}

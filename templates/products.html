@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between">
+  <h1 class="h4">Products</h1>
+  <div class="text-muted small">{{ total }} results</div>
+</div>
+
+<form class="row g-2 my-3">
+  <div class="col-md-3">
+    <input class="form-control" name="q" value="{{ q }}" placeholder="Search products…">
+  </div>
+  <div class="col-md-2">
+    <select class="form-select" name="category">
+      <option value="">All categories</option>
+      {% for c in categories %}
+        <option value="{{ c }}" {{ 'selected' if c==category else '' }}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select class="form-select" name="brand">
+      <option value="">All brands</option>
+      {% for b in brands %}
+        <option value="{{ b }}" {{ 'selected' if b==brand else '' }}>{{ b }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="min_price" value="{{ min_price }}" placeholder="Min price">
+  </div>
+  <div class="col-md-2">
+    <input class="form-control" name="max_price" value="{{ max_price }}" placeholder="Max price">
+  </div>
+  <div class="col-md-1">
+    <select class="form-select" name="sort" title="Sort">
+      <option value="newest" {{ 'selected' if sort=='newest' else '' }}>Newest</option>
+      <option value="price_asc" {{ 'selected' if sort=='price_asc' else '' }}>Price ↑</option>
+      <option value="price_desc" {{ 'selected' if sort=='price_desc' else '' }}>Price ↓</option>
+      <option value="rating" {{ 'selected' if sort=='rating' else '' }}>Top rated</option>
+      <option value="name_asc" {{ 'selected' if sort=='name_asc' else '' }}>Name A–Z</option>
+      <option value="name_desc" {{ 'selected' if sort=='name_desc' else '' }}>Name Z–A</option>
+    </select>
+  </div>
+  <div class="col-12 d-flex gap-2">
+    <button class="btn btn-primary">Apply</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('products') }}">Reset</a>
+  </div>
+</form>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+  {% for p in items %}
+    <div class="col">
+      <div class="card h-100">
+        <img src="{{ p.image_url or url_for('static', filename='img/placeholder.svg') }}"
+             class="card-img-top" alt="{{ p.name }}">
+        <div class="card-body">
+          <h3 class="h6 card-title">
+            <a class="text-decoration-none" href="{{ url_for('product_detail', slug_or_id=p.slug) }}">
+              {{ p.name }}
+            </a>
+          </h3>
+          <p class="mb-1">
+            {% if p.sale_price and p.sale_price < p.price %}
+              <span class="text-muted text-decoration-line-through">{{ p.price|money }}</span>
+              <span class="fw-bold text-danger">{{ p.sale_price|money }}</span>
+            {% else %}
+              <span class="fw-bold">{{ p.price|money }}</span>
+            {% endif %}
+          </p>
+          <div class="small text-muted">
+            {{ p.brand }} • {{ p.category }}
+            {% if p.stock and p.stock > 0 %}
+              <span class="badge bg-success ms-2">{{ p.stock }} in stock</span>
+            {% else %}
+              <span class="badge bg-secondary ms-2">Out of stock</span>
+            {% endif %}
+          </div>
+          
+          {% if auth_user and p.stock and p.stock > 0 %}
+            <form action="{{ url_for('cart_add', slug_or_id=p.slug) }}" method="post" class="mt-2">
+              <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add to Cart</button>
+            </form>
+          {% elif not auth_user %}
+            <div class="mt-2 small text-muted">Log in to add to cart</div>
+          {% endif %}
+          
+          <!-- ✅ Pay with M-Pesa form -->
+          {% if p.stock and p.stock > 0 %}
+          <form class="mpesaForm mt-2">
+            <input type="hidden" class="amount"
+                   value="{{ p.sale_price if p.sale_price and p.sale_price < p.price else p.price }}">
+            <input type="hidden" class="account_ref" value="{{ p.slug }}">
+            <input type="text" class="form-control form-control-sm phone mb-1"
+                     placeholder="07XXXXXXXX" value="{{ user_phone or '' }}">
+
+            <button type="button" class="btn btn-sm btn-success w-100 payBtn">
+              Pay with M-Pesa
+            </button>
+            <div class="small mt-1 msg"></div>
+          </form>
+          {% else %}
+          <span class="badge text-bg-secondary">Out of stock</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% if pages > 1 %}
+<nav class="mt-4 d-flex justify-content-center">
+  <ul class="pagination justify-content-center">
+
+    {% set window = 10 %}
+    {% set start = page - (window // 2) + 1 %}
+    {% if start < 1 %}{% set start = 1 %}{% endif %}
+    {% set end = start + window - 1 %}
+    {% if end > pages %}
+      {% set end = pages %}
+      {% set start = pages - window + 1 %}
+      {% if start < 1 %}{% set start = 1 %}{% endif %}
+    {% endif %}
+
+    {% for p in range(start, end + 1) %}
+      <li class="page-item {{ 'active' if p == page else '' }}">
+        <a class="page-link"
+           href="{{ url_for('products',
+                            q=q, category=category, brand=brand,
+                            min_price=min_price, max_price=max_price,
+                            sort=sort, page=p, per_page=per_page) }}">{{ p }}</a>
+      </li>
+    {% endfor %}
+
+    <li class="page-item {{ 'disabled' if page >= pages else '' }}">
+      <a class="page-link"
+         href="{{ url_for('products',
+                          q=q, category=category, brand=brand,
+                          min_price=min_price, max_price=max_price,
+                          sort=sort, page=(page + 1 if page < pages else pages),
+                          per_page=per_page) }}">Next »</a>
+    </li>
+
+  </ul>
+</nav>
+{% endif %}
+
+<!-- ✅ JS handler for multiple Pay with M-Pesa forms -->
+<script>
+document.querySelectorAll(".mpesaForm").forEach(form => {
+  const btn = form.querySelector(".payBtn");
+  btn.addEventListener("click", async () => {
+    const phone = form.querySelector(".phone").value.trim();
+    const amount = form.querySelector(".amount").value;
+    const ref = form.querySelector(".account_ref").value;
+    const msgEl = form.querySelector(".msg");
+    msgEl.innerHTML = "Processing...";
+
+    try {
+      const res = await fetch("{{ url_for('mpesa.stk_push') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone_number: phone, amount: amount, account_ref: ref })
+      });
+      const data = await res.json();
+      if (res.ok && data.ok !== false) {
+        msgEl.innerHTML = `<span class="text-success">STK Push sent! Check your phone.</span>`;
+      } else {
+        msgEl.innerHTML = `<span class="text-danger">Failed: ${data.error || "Unknown error"}</span>`;
+      }
+    } catch (err) {
+      msgEl.innerHTML = `<span class="text-danger">Error: ${err.message}</span>`;
+    }
+  });
+});
+</script>
+{% endblock %}

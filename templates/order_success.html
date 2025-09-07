@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h4 mb-3">Order Success</h1>
+
+<p>Thank you, {{ auth_user.full_name }}! 🎉</p>
+<p>Your order <strong>#{{ order._id }}</strong> has been placed successfully.</p>
+
+<h2 class="h5 mt-4">Order Summary</h2>
+<ul class="list-group mb-3">
+  {% for i in order["items"] %}
+    <li class="list-group-item d-flex justify-content-between">
+      {{ i.product.name }} × {{ i.quantity }}
+      <span>
+        {{ (i.quantity * (i.product.sale_price or i.product.price))|money }}
+      </span>
+    </li>
+  {% endfor %}
+  <li class="list-group-item d-flex justify-content-between fw-bold">
+    Total
+    <span>{{ order.total|money }}</span>
+  </li>
+</ul>
+
+<div class="alert alert-info">
+  Payment is pending confirmation. We’ll notify you once M-Pesa confirms your payment.
+</div>
+
+<a href="{{ url_for('products') }}" class="btn btn-primary">Continue Shopping</a>
+{% endblock %}

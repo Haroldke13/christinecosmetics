@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h4">New product</h1>
+<form method="post" class="row g-3">
+  <div class="col-md-6">
+    <label class="form-label">Name</label>
+    <input class="form-control" name="name" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Slug (optional)</label>
+    <input class="form-control" name="slug" placeholder="auto-generated from name">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Brand</label>
+    <input class="form-control" name="brand">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Category</label>
+    <input class="form-control" name="category">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Price</label>
+    <input class="form-control" name="price" value="1499" required>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Sale price</label>
+    <input class="form-control" name="sale_price" value="0">
+  </div>
+  <div class="col-12">
+    <label class="form-label">Image URL</label>
+    <input class="form-control" name="image_url" placeholder="https://...">
+  </div>
+  <div class="col-12">
+    <label class="form-label">Description</label>
+    <textarea class="form-control" rows="4" name="description"></textarea>
+  </div>
+  <div class="col-12">
+    <label class="form-label">Ingredients</label>
+    <textarea class="form-control" rows="3" name="ingredients"></textarea>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Skin type</label>
+    <input class="form-control" name="skin_type" placeholder="All / Dry / Oily ...">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Rating</label>
+    <input class="form-control" name="rating" value="4.8">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Stock</label>
+    <input class="form-control" name="stock" value="100">
+  </div>
+  <div class="col-md-3 form-check mt-4">
+    <input class="form-check-input" type="checkbox" name="is_featured" id="featured">
+    <label class="form-check-label" for="featured">Featured</label>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary">Create</button>
+  </div>
+</form>
+{% endblock %}

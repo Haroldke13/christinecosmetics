@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ site_name }}{% if title %} — {{ title }}{% endif %}</title>
+  <meta name="description" content="Christine Cosmetics — premium ladies' cosmetics for every skin tone & type.">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">Christine<span class="text-primary">Cosmetics</span></a>
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+    
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('products') }}">Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+        
+        <div class="d-flex align-items-center gap-3">
+          <!-- ✅ Cart icon with count -->
+          <a href="{{ url_for('view_cart') }}" class="btn btn-outline-primary position-relative">
+            <i class="bi bi-cart3"></i>
+            {% if cart_count and cart_count > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ cart_count }}
+              </span>
+            {% endif %}
+          </a>
+        
+          {% if auth_user %}
+            <span class="navbar-text me-2">Hi, {{ auth_user.full_name or auth_user.email }}</span>
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('logout') }}">Logout</a>
+          {% else %}
+            <a class="btn btn-sm btn-primary me-2" href="{{ url_for('signup') }}">Sign up</a>
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('login') }}">Login</a>
+          {% endif %}
+        </div>
+        
+        
+
+      <form class="d-flex" role="search" action="{{ url_for('products') }}">
+        <input class="form-control me-2" type="search" name="q" placeholder="Search lipsticks, skincare…" value="{{ request.args.get('q','') }}">
+        <button class="btn btn-primary">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<main class="py-4">
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+          {% for cat, msg in messages %}
+            <div class="toast align-items-center text-bg-{{ 'success' if cat=='success' else 'warning' if cat=='warning' else 'danger' if cat=='danger' else 'info' }} border-0 show mb-2">
+              <div class="d-flex">
+                <div class="toast-body">{{ msg }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<footer class="border-top py-4 mt-5">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center">
+    <p class="mb-0 small">&copy; {{ now_year }} {{ site_name }}. All rights reserved.</p>
+    <form class="d-flex gap-2" method="post" action="{{ url_for('subscribe') }}">
+      <input type="email" name="email" class="form-control form-control-sm" placeholder="Join our newsletter">
+      <button class="btn btn-sm btn-outline-primary">Subscribe</button>
+    </form>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
