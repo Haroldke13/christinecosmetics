@@ -1,0 +1,9 @@
+Flask==3.0.3
+pymongo[srv]==4.8.0
+dnspython==2.6.1
+gunicorn==22.0.0
+python-dotenv==1.0.1
+requests
+reportlab
+Flask-Mail
+flask_pymongo
